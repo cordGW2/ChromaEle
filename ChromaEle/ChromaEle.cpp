@@ -3,10 +3,12 @@
 
 #include "ChromaManager.h"
 #include "Util.h"
+#include "Settings.h"
 
 using namespace std;
 
 ChromaManager chroma;
+Settings* settings;
 int attunement = -1	;
 
 HWND Hwnd;
@@ -15,13 +17,8 @@ NOTIFYICONDATA notifyIconData;
 TCHAR szTIP[64] = TEXT("ChromaEle");
 char szClassName[] = "chromaEleTray";
 
-COLORREF fireColor, waterColor, airColor, earthColor;
-BYTE fireSI, waterSI, airSI, earthSI;
-BYTE fireOI, waterOI, airOI, earthOI;
-BOOL tempest, checkGW2;
-
 bool IsGW2Running() {
-	return IsProcessRunning("Gw2-64.exe") || IsProcessRunning("Gw2.exe") || !checkGW2;
+	return IsProcessRunning("Gw2-64.exe") || IsProcessRunning("Gw2.exe") || !settings->getCheckGW2();
 }
 
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
@@ -37,30 +34,30 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	switch (pressedKey) {
 		case VK_F1:
 			if (!IsGW2Running()) break;
-			if (tempest && attunement == 1) {
-				chroma.EffectOverload(fireColor, fireOI);
-			} else if (attunement != 1) chroma.EffectAttunement(fireColor, fireSI);
+			if (settings->getTempest() && attunement == 1) {
+				chroma.EffectOverload(settings->getFireColor(), settings->getFireOI());
+			} else if (attunement != 1) chroma.EffectAttunement(settings->getFireColor(), settings->getFireSI());
 			attunement = 1;
 			break;
 		case VK_F2:
 			if (!IsGW2Running()) break;
-			if (tempest && attunement == 2) {
-				chroma.EffectOverload(waterColor, waterOI);
-			} else if (attunement != 2)  chroma.EffectAttunement(waterColor, waterSI);
+			if (settings->getTempest() && attunement == 2) {
+				chroma.EffectOverload(settings->getWaterColor(), settings->getWaterOI());
+			} else if (attunement != 2)  chroma.EffectAttunement(settings->getWaterColor(), settings->getWaterSI());
 			attunement = 2;
 			break;
 		case VK_F3:
 			if (!IsGW2Running()) break;
-			if (tempest && attunement == 3) {
-				chroma.EffectOverload(airColor, airOI);
-			} else if (attunement != 3)  chroma.EffectAttunement(airColor, airSI);
+			if (settings->getTempest() && attunement == 3) {
+				chroma.EffectOverload(settings->getAirColor(), settings->getAirOI());
+			} else if (attunement != 3)  chroma.EffectAttunement(settings->getAirColor(), settings->getAirSI());
 			attunement = 3;
 			break;
 		case VK_F4:
 			if (!IsGW2Running()) break;
-			if (tempest && attunement == 4) {
-				chroma.EffectOverload(earthColor, earthOI);
-			} else if (attunement != 4)  chroma.EffectAttunement(earthColor, earthSI);
+			if (settings->getTempest() && attunement == 4) {
+				chroma.EffectOverload(settings->getEarthColor(), settings->getEarthOI());
+			} else if (attunement != 4)  chroma.EffectAttunement(settings->getEarthColor(), settings->getEarthSI());
 			attunement = 4;
 			break;
 		default: break;
@@ -72,7 +69,7 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 	switch (message) {
 		case WM_CREATE:
 			Hmenu = CreatePopupMenu();
-			AppendMenu(Hmenu, tempest ? MF_CHECKED : MF_UNCHECKED, ID_TRAY_TEMPEST, TEXT("Tempest"));
+			AppendMenu(Hmenu, settings->getTempest() ? MF_CHECKED : MF_UNCHECKED, ID_TRAY_TEMPEST, TEXT("Tempest"));
 			AppendMenu(Hmenu, MF_SEPARATOR, 0, NULL);
 			AppendMenu(Hmenu, MF_STRING, ID_TRAY_EXIT, TEXT("Quit"));
 			break;
@@ -85,9 +82,8 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 				SendMessage(hwnd, WM_NULL, 0, 0);
 				switch (clicked) {
 					case  ID_TRAY_TEMPEST:
-						tempest = tempest ? 0 : 1;
-						WritePrivateProfileString(TEXT("effects"), TEXT("tempest"), TEXT(tempest ? "1" : "0"), TEXT(".\\chromaEle.ini"));
-						CheckMenuItem(Hmenu, ID_TRAY_TEMPEST, MF_BYCOMMAND | (tempest ? MF_CHECKED : MF_UNCHECKED));
+						settings->setTempest(settings->getTempest() ? 0 : 1);
+						CheckMenuItem(Hmenu, ID_TRAY_TEMPEST, MF_BYCOMMAND | (settings->getTempest() ? MF_CHECKED : MF_UNCHECKED));
 						break;
 					case ID_TRAY_EXIT:
 						Shell_NotifyIcon(NIM_DELETE, &notifyIconData);
@@ -103,23 +99,7 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 
 INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nCmdShow) {
 	OutputDebugString(_T("ChromaEle starting\n"));
-	fireColor = ColorFromIni(_T("colors"), _T(".\\chromaEle.ini"), _T("fireR"), _T("fireG"), _T("fireB"));
-	waterColor = ColorFromIni(_T("colors"), _T(".\\chromaEle.ini"), _T("waterR"), _T("waterG"), _T("waterB"));
-	airColor = ColorFromIni(_T("colors"), _T(".\\chromaEle.ini"), _T("airR"), _T("airG"), _T("airB"));
-	earthColor = ColorFromIni(_T("colors"), _T(".\\chromaEle.ini"), _T("earthR"), _T("earthG"), _T("earthB"));
-
-	fireSI = GetPrivateProfileInt(_T("effects"), _T("fireSwitchIntensity"), 0, _T(".\\chromaEle.ini"));
-	waterSI = GetPrivateProfileInt(_T("effects"), _T("waterSwitchIntensity"), 0, _T(".\\chromaEle.ini"));
-	airSI = GetPrivateProfileInt(_T("effects"), _T("airSwitchIntensity"), 0, _T(".\\chromaEle.ini"));
-	earthSI = GetPrivateProfileInt(_T("effects"), _T("earthSwitchIntensity"), 0, _T(".\\chromaEle.ini"));
-
-	fireOI = GetPrivateProfileInt(_T("effects"), _T("fireOverloadIntensity"), 0, _T(".\\chromaEle.ini"));
-	waterOI = GetPrivateProfileInt(_T("effects"), _T("waterOverloadIntensity"), 0, _T(".\\chromaEle.ini"));
-	airOI = GetPrivateProfileInt(_T("effects"), _T("airOverloadIntensity"), 0, _T(".\\chromaEle.ini"));
-	earthOI = GetPrivateProfileInt(_T("effects"), _T("earthOverloadIntensity"), 0, _T(".\\chromaEle.ini"));
-
-	tempest = GetPrivateProfileInt(_T("effects"), _T("tempest"), 0, _T(".\\chromaEle.ini"));
-	checkGW2 = GetPrivateProfileInt(_T("effects"), _T("checkgw2"), 0, _T(".\\chromaEle.ini"));
+	settings = new Settings(_T(".\\chromaEle.ini"));
 	BOOL initalized = chroma.Initialize();
 	HHOOK hhkLowLevelKybd = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, 0, 0);
 	if (initalized) {

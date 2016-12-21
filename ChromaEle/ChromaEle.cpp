@@ -4,21 +4,7 @@
 #include "ChromaManager.h"
 #include "Util.h"
 
-#ifdef _WIN64
-#define CHROMASDKDLL        _T("RzChromaSDK64.dll")
-#else
-#define CHROMASDKDLL        _T("RzChromaSDK.dll")
-#endif
-
 using namespace std;
-
-typedef RZRESULT(*INIT)(void);
-typedef RZRESULT(*CREATEKEYBOARDEFFECT)(ChromaSDK::Keyboard::EFFECT_TYPE Effect, PRZPARAM pParam, RZEFFECTID *pEffectId);
-typedef RZRESULT(*CREATEMOUSEEFFECT)(ChromaSDK::Mouse::EFFECT_TYPE Effect, PRZPARAM pParam, RZEFFECTID *pEffectId);
-
-INIT Init = nullptr;
-CREATEKEYBOARDEFFECT CreateKeyboardEffect = nullptr;
-CREATEMOUSEEFFECT CreateMouseEffect = nullptr;
 
 ChromaManager chroma;
 int attunement = -1	;
@@ -33,24 +19,6 @@ COLORREF fireColor, waterColor, airColor, earthColor;
 BYTE fireSI, waterSI, airSI, earthSI;
 BYTE fireOI, waterOI, airOI, earthOI;
 BOOL tempest, checkGW2;
-
-void colorEffect(COLORREF color) {
-	ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE kbEffect = {};
-	for (UINT row = 0; row < ChromaSDK::Keyboard::MAX_ROW; row++) {
-		for (UINT col = 0; col < ChromaSDK::Keyboard::MAX_COLUMN; col++) {
-			kbEffect.Color[row][col] = color;
-		}
-	}
-	CreateKeyboardEffect(ChromaSDK::Keyboard::CHROMA_CUSTOM, &kbEffect, nullptr);
-
-	ChromaSDK::Mouse::CUSTOM_EFFECT_TYPE2 msEffect = {};
-	for (UINT row = 0; row < ChromaSDK::Mouse::MAX_ROW; row++) {
-		for (UINT col = 0; col < ChromaSDK::Mouse::MAX_COLUMN; col++) {
-			msEffect.Color[row][col] = color;
-		}
-	}
-	CreateMouseEffect(ChromaSDK::Mouse::CHROMA_CUSTOM2, &msEffect, nullptr);
-}
 
 bool IsGW2Running() {
 	return IsProcessRunning("Gw2-64.exe") || IsProcessRunning("Gw2.exe") || !checkGW2;

@@ -119,6 +119,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ChromaManager.h" />
+    <ClInclude Include="KeyState.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="RzChromaSDKDefines.h" />
     <ClInclude Include="RzChromaSDKTypes.h" />
@@ -131,6 +132,7 @@
   <ItemGroup>
     <ClCompile Include="ChromaEle.cpp" />
     <ClCompile Include="ChromaManager.cpp" />
+    <ClCompile Include="KeyState.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Util.cpp" />

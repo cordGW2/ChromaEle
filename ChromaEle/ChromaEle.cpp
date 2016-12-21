@@ -4,11 +4,13 @@
 #include "ChromaManager.h"
 #include "Util.h"
 #include "Settings.h"
+#include "KeyState.h"
 
 using namespace std;
 
 ChromaManager chroma;
 Settings settings(_T(".\\chromaEle.ini"));
+KeyState keys;
 int attunement = -1	;
 
 HWND Hwnd;
@@ -22,45 +24,32 @@ bool IsGW2Running() {
 }
 
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
-	static char lastKey;
-	if (wParam == WM_KEYUP) {
-		lastKey = 0;
-	}
-	if (wParam != WM_KEYDOWN) return CallNextHookEx(NULL, nCode, wParam, lParam);
-	KBDLLHOOKSTRUCT *keyBoard = (KBDLLHOOKSTRUCT*)lParam;
-	char pressedKey = (char)keyBoard->vkCode;
-	if (pressedKey == lastKey) return CallNextHookEx(NULL, nCode, wParam, lParam);
-	lastKey = pressedKey;
-	switch (pressedKey) {
-		case VK_F1:
-			if (!IsGW2Running()) break;
-			if (settings.getTempest() && attunement == 1) {
-				chroma.EffectOverload(settings.getFireColor(), settings.getFireOI());
-			} else if (attunement != 1) chroma.EffectAttunement(settings.getFireColor(), settings.getFireSI());
-			attunement = 1;
-			break;
-		case VK_F2:
-			if (!IsGW2Running()) break;
-			if (settings.getTempest() && attunement == 2) {
-				chroma.EffectOverload(settings.getWaterColor(), settings.getWaterOI());
-			} else if (attunement != 2)  chroma.EffectAttunement(settings.getWaterColor(), settings.getWaterSI());
-			attunement = 2;
-			break;
-		case VK_F3:
-			if (!IsGW2Running()) break;
-			if (settings.getTempest() && attunement == 3) {
-				chroma.EffectOverload(settings.getAirColor(), settings.getAirOI());
-			} else if (attunement != 3)  chroma.EffectAttunement(settings.getAirColor(), settings.getAirSI());
-			attunement = 3;
-			break;
-		case VK_F4:
-			if (!IsGW2Running()) break;
-			if (settings.getTempest() && attunement == 4) {
-				chroma.EffectOverload(settings.getEarthColor(), settings.getEarthOI());
-			} else if (attunement != 4)  chroma.EffectAttunement(settings.getEarthColor(), settings.getEarthSI());
-			attunement = 4;
-			break;
-		default: break;
+	keys.InputLowlevel(nCode, wParam, lParam);
+	if (!IsGW2Running()) return CallNextHookEx(NULL, nCode, wParam, lParam);
+	if (keys.getKeyPress(VK_F1)) {
+		if (settings.getTempest() && attunement == 1) {
+			chroma.EffectOverload(settings.getFireColor(), settings.getFireOI());
+		}
+		else if (attunement != 1) chroma.EffectAttunement(settings.getFireColor(), settings.getFireSI());
+		attunement = 1;
+	} else if (keys.getKeyPress(VK_F2)) {
+		if (settings.getTempest() && attunement == 2) {
+			chroma.EffectOverload(settings.getWaterColor(), settings.getWaterOI());
+		}
+		else if (attunement != 2)  chroma.EffectAttunement(settings.getWaterColor(), settings.getWaterSI());
+		attunement = 2;
+	} else if (keys.getKeyPress(VK_F3)) {
+		if (settings.getTempest() && attunement == 3) {
+			chroma.EffectOverload(settings.getAirColor(), settings.getAirOI());
+		}
+		else if (attunement != 3)  chroma.EffectAttunement(settings.getAirColor(), settings.getAirSI());
+		attunement = 3;
+	} else if (keys.getKeyPress(VK_F4)) {
+		if (settings.getTempest() && attunement == 4) {
+			chroma.EffectOverload(settings.getEarthColor(), settings.getEarthOI());
+		}
+		else if (attunement != 4)  chroma.EffectAttunement(settings.getEarthColor(), settings.getEarthSI());
+		attunement = 4;
 	}
 	return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
@@ -93,6 +82,7 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 				}
 			}
 			break;
+		default: break;
 	}
 	return DefWindowProc(hwnd, message, wParam, lParam);
 }

@@ -57,10 +57,6 @@ BYTE Settings::getEarthSI() {
 	return earthSI;
 }
 
-BOOL Settings::getTempest() {
-	return tempest;
-}
-
 BYTE Settings::getFireOI() {
 	return fireOI;
 }

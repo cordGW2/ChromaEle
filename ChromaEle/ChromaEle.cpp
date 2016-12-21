@@ -72,6 +72,8 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 	switch (message) {
 		case WM_CREATE:
 			Hmenu = CreatePopupMenu();
+			AppendMenu(Hmenu, tempest ? MF_CHECKED : MF_UNCHECKED, ID_TRAY_TEMPEST, TEXT("Tempest"));
+			AppendMenu(Hmenu, MF_SEPARATOR, 0, NULL);
 			AppendMenu(Hmenu, MF_STRING, ID_TRAY_EXIT, TEXT("Quit"));
 			break;
 		case WM_SYSICON:
@@ -81,9 +83,17 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 				SetForegroundWindow(Hwnd);
 				UINT clicked = TrackPopupMenu(Hmenu, TPM_RETURNCMD | TPM_NONOTIFY, curPoint.x, curPoint.y, 0, hwnd, NULL);
 				SendMessage(hwnd, WM_NULL, 0, 0);
-				if (clicked == ID_TRAY_EXIT) {
-					Shell_NotifyIcon(NIM_DELETE, &notifyIconData);
-					PostQuitMessage(0);
+				switch (clicked) {
+					case  ID_TRAY_TEMPEST:
+						tempest = tempest ? 0 : 1;
+						WritePrivateProfileString(TEXT("effects"), TEXT("tempest"), TEXT(tempest ? "1" : "0"), TEXT(".\\chromaEle.ini"));
+						CheckMenuItem(Hmenu, ID_TRAY_TEMPEST, MF_BYCOMMAND | (tempest ? MF_CHECKED : MF_UNCHECKED));
+						break;
+					case ID_TRAY_EXIT:
+						Shell_NotifyIcon(NIM_DELETE, &notifyIconData);
+						PostQuitMessage(0);
+						break;
+					default: break;
 				}
 			}
 			break;

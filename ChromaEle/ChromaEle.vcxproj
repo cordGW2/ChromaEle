@@ -118,7 +118,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ChromaEle.h" />
+    <ClInclude Include="ChromaManager.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="RzChromaSDKDefines.h" />
     <ClInclude Include="RzChromaSDKTypes.h" />
@@ -129,6 +129,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChromaEle.cpp" />
+    <ClCompile Include="ChromaManager.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Util.cpp" />
   </ItemGroup>

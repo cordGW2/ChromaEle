@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "resource.h"
 
-#include "ChromaEle.h"
+#include "ChromaManager.h"
 #include "Util.h"
 
 #ifdef _WIN64
@@ -20,9 +20,8 @@ INIT Init = nullptr;
 CREATEKEYBOARDEFFECT CreateKeyboardEffect = nullptr;
 CREATEMOUSEEFFECT CreateMouseEffect = nullptr;
 
-ChromaImplementation chroma;
+ChromaManager chroma;
 int attunement = -1	;
-DWORD currentEffect = 0;
 
 HWND Hwnd;
 HMENU Hmenu;
@@ -34,25 +33,6 @@ COLORREF fireColor, waterColor, airColor, earthColor;
 BYTE fireSI, waterSI, airSI, earthSI;
 BYTE fireOI, waterOI, airOI, earthOI;
 BOOL tempest, checkGW2;
-
-BOOL ChromaImplementation::Initialize() {
-	if (chromaSDKModule == nullptr) {
-		chromaSDKModule = LoadLibrary(CHROMASDKDLL);
-		if (chromaSDKModule == nullptr) return FALSE;
-	}
-	if (Init == nullptr) {
-		RZRESULT Result = RZRESULT_INVALID;
-		Init = reinterpret_cast<INIT>(GetProcAddress(chromaSDKModule, "Init"));
-		if (!Init) return FALSE;
-		Result = Init();
-		if (Result == RZRESULT_SUCCESS) {
-			CreateKeyboardEffect = reinterpret_cast<CREATEKEYBOARDEFFECT>(GetProcAddress(chromaSDKModule, "CreateKeyboardEffect"));
-			CreateMouseEffect = reinterpret_cast<CREATEMOUSEEFFECT>(GetProcAddress(chromaSDKModule, "CreateMouseEffect"));
-			if (CreateKeyboardEffect && CreateMouseEffect) return TRUE;
-		}
-	}
-	return FALSE;
-}
 
 void colorEffect(COLORREF color) {
 	ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE kbEffect = {};
@@ -76,61 +56,6 @@ bool IsGW2Running() {
 	return IsProcessRunning("Gw2-64.exe") || IsProcessRunning("Gw2.exe") || !checkGW2;
 }
 
-DWORD WINAPI EffectAttunementThread(LPVOID lpParam) {
-	if (!IsGW2Running()) return 0;
-	currentEffect = GetCurrentThreadId();
-	effect_data* data = (effect_data*)lpParam;
-	COLORREF color = data->color;
-	BYTE blinkRed = 255, blinkGreen = 255, blinkBlue = 255;
-	if (GetRValue(color) + data->intensity <= 255) blinkRed = GetRValue(color) + data->intensity;
-	if (GetGValue(color) + data->intensity <= 255) blinkGreen = GetGValue(color) + data->intensity;
-	if (GetBValue(color) + data->intensity <= 255) blinkBlue = GetBValue(color) + data->intensity;
-	COLORREF blinkColor = RGB(blinkRed, blinkGreen, blinkBlue);
-	colorEffect(blinkColor);
-	Sleep(150);
-	colorEffect(color);
-	delete data;
-	return 0;
-}
-
-void ChromaImplementation::EffectAttunement(COLORREF color, BYTE intensity) {
-	effect_data* data = new effect_data();
-	data->color = color;
-	data->intensity = intensity;
-	CreateThread(NULL, 0, EffectAttunementThread, data, 0, &currentEffect);
-}
-
-DWORD WINAPI EffectOverloadThread(LPVOID lpParam) {
-	if (!IsGW2Running()) return 0;
-	currentEffect = GetCurrentThreadId();
-	effect_data* data = (effect_data*)lpParam;
-	COLORREF color = data->color;
-	int time = 0;
-	while (time < 5000) {
-		if (currentEffect != GetCurrentThreadId()) return 0;
-		BYTE blinkRed = 255, blinkGreen = 255, blinkBlue = 255;
-		float factor = -0.5f * cosf(time / 125.0f) + 0.5f;
-		BYTE intensity = (BYTE)(factor * data->intensity);
-		if (GetRValue(color) + intensity <= 255) blinkRed = GetRValue(color) + intensity;
-		if (GetGValue(color) + intensity <= 255) blinkGreen = GetGValue(color) + intensity;
-		if (GetBValue(color) + intensity <= 255) blinkBlue = GetBValue(color) + intensity;
-		COLORREF blinkColor = RGB(blinkRed, blinkGreen, blinkBlue);
-		colorEffect(blinkColor);
-		time += 20;
-		Sleep(20);
-	}
-	colorEffect(color);
-	delete data;
-	return 0;
-}
-
-void ChromaImplementation::EffectOverload(COLORREF color, BYTE intensity) {
-	effect_data* data = new effect_data();
-	data->color = color;
-	data->intensity = intensity;
-	CreateThread(NULL, 0, EffectOverloadThread, data, 0, &currentEffect);
-}
-
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	static char lastKey;
 	if (wParam == WM_KEYUP) {
@@ -143,24 +68,28 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	lastKey = pressedKey;
 	switch (pressedKey) {
 		case VK_F1:
+			if (!IsGW2Running()) break;
 			if (tempest && attunement == 1) {
 				chroma.EffectOverload(fireColor, fireOI);
 			} else if (attunement != 1) chroma.EffectAttunement(fireColor, fireSI);
 			attunement = 1;
 			break;
 		case VK_F2:
+			if (!IsGW2Running()) break;
 			if (tempest && attunement == 2) {
 				chroma.EffectOverload(waterColor, waterOI);
 			} else if (attunement != 2)  chroma.EffectAttunement(waterColor, waterSI);
 			attunement = 2;
 			break;
 		case VK_F3:
+			if (!IsGW2Running()) break;
 			if (tempest && attunement == 3) {
 				chroma.EffectOverload(airColor, airOI);
 			} else if (attunement != 3)  chroma.EffectAttunement(airColor, airSI);
 			attunement = 3;
 			break;
 		case VK_F4:
+			if (!IsGW2Running()) break;
 			if (tempest && attunement == 4) {
 				chroma.EffectOverload(earthColor, earthOI);
 			} else if (attunement != 4)  chroma.EffectAttunement(earthColor, earthSI);

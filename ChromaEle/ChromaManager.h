@@ -9,8 +9,7 @@ struct effect_data {
 	BYTE intensity;
 };
 
-class ChromaImplementation
-{
+class ChromaManager {
 public:
 	BOOL Initialize();
 	void EffectAttunement(COLORREF color, BYTE intensity);
@@ -18,3 +17,4 @@ public:
 private:
 	HMODULE chromaSDKModule;
 };
+

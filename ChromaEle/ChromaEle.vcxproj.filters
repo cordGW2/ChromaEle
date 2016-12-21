@@ -1,73 +1,73 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Quelldateien">
+    <Filter Include="Sources">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Headerdateien">
+    <Filter Include="Headers">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Ressourcendateien">
+    <Filter Include="Ressources">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RzChromaSDKDefines.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="RzChromaSDKTypes.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="RzErrors.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Util.h">
-      <Filter>Quelldateien</Filter>
+      <Filter>Sources</Filter>
     </ClInclude>
     <ClInclude Include="ChromaManager.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Settings.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
-      <Filter>Quelldateien</Filter>
+      <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="ChromaEle.cpp">
-      <Filter>Quelldateien</Filter>
+      <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Util.cpp">
-      <Filter>Quelldateien</Filter>
+      <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="ChromaManager.cpp">
-      <Filter>Quelldateien</Filter>
+      <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Settings.cpp">
-      <Filter>Quelldateien</Filter>
+      <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
-      <Filter>Ressourcendateien</Filter>
+      <Filter>Ressources</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="icon.ico">
-      <Filter>Ressourcendateien</Filter>
+      <Filter>Ressources</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

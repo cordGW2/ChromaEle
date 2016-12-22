@@ -2,15 +2,16 @@
 #include "resource.h"
 
 #include "ChromaManager.h"
-#include "Util.h"
 #include "Settings.h"
 #include "KeyState.h"
+#include "GameState.h"
 
 using namespace std;
 
 ChromaManager chroma;
 Settings settings(_T(".\\chromaEle.ini"));
 KeyState keys;
+GameState game;
 int attunement = -1	;
 
 HWND Hwnd;
@@ -19,13 +20,9 @@ NOTIFYICONDATA notifyIconData;
 TCHAR szTIP[64] = TEXT("ChromaEle");
 char szClassName[] = "chromaEleTray";
 
-bool IsGW2Running() {
-	return IsProcessRunning("Gw2-64.exe") || IsProcessRunning("Gw2.exe") || !settings.getCheckGW2();
-}
-
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	keys.InputLowlevel(nCode, wParam, lParam);
-	if (!IsGW2Running()) return CallNextHookEx(NULL, nCode, wParam, lParam);
+	if (!(settings.getCheckGW2() || game.isRunning())) return CallNextHookEx(NULL, nCode, wParam, lParam);
 	if (keys.getKeyPress(VK_F1)) {
 		if (settings.getTempest() && attunement == 1) {
 			chroma.EffectOverload(settings.getFireColor(), settings.getFireOI());

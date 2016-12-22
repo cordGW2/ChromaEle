@@ -45,6 +45,9 @@
     <ClInclude Include="KeyState.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="GameState.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -63,6 +66,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="KeyState.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="GameState.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
